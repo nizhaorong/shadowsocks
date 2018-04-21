@@ -72,20 +72,25 @@ class ServerControl(object):
 
     def stop_or_start_server(self, user):
         port = int(user['port'])
+        if hasattr(user['password'], 'encode'):
+            user['password'] = user['password'].encode('utf-8')
+        password = user['password']
+
         is_run = ServerPool.get_instance().server_is_run(port)
         old_password = self._users[port].get('password', None)
+
 
         if is_run and user['isLocked']:
             logging.info('db stop server at port [%s] reason: disable' % (port))
             ServerPool.get_instance().del_server(port)
-        elif is_run and old_password != user['password']:
+        elif is_run and old_password != password:
             logging.info('db stop server at port [%s] reason: password changed' % (port))
             ServerPool.get_instance().del_server(port)
-        else:
-            logging.info('db start server at port [%s] pass [%s]' % (port, user['password']))
+        elif not is_run:
+            logging.info('db start server at port [%s] pass [%s]' % (port, password))
             ServerPool.get_instance().add_server({
                 'server_port': port,
-                'password': user['password']
+                'password': password
             })
             self._users[port] = user
 
