@@ -44,12 +44,15 @@ class ServerControl(object):
     def run(self):
         while True:
             try:
+                logging.info('start synchronizing data')
                 self.sync_user()
                 self.update_traffic()
+                logging.info('synchronized data successfully')
             except Exception as e:
                 traceback.print_exc()
-                logging.warn('db thread except:%s' % e)
+                logging.warn('synchronous data exception:%s' % e)
             if self._event.wait(config.UPDATE_TIME):
+                logging.info('stoping control thread')
                 break
 
     def stop(self):
@@ -81,13 +84,13 @@ class ServerControl(object):
 
 
         if is_run and user['isLocked']:
-            logging.info('db stop server at port [%s] reason: disable' % (port))
+            logging.info('stop server at port [%s] reason: disable' % (port))
             ServerPool.get_instance().del_server(port)
         elif is_run and old_password != password:
-            logging.info('db stop server at port [%s] reason: password changed' % (port))
+            logging.info('stop server at port [%s] reason: password changed' % (port))
             ServerPool.get_instance().del_server(port)
         elif not is_run:
-            logging.info('db start server at port [%s] pass [%s]' % (port, password))
+            logging.info('start server at port [%s] pass [%s]' % (port, password))
             ServerPool.get_instance().add_server({
                 'server_port': port,
                 'password': password
