@@ -1,5 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 qiujun
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
 
 from __future__ import absolute_import, division, print_function, \
     with_statement
@@ -10,7 +24,7 @@ import threading
 import config
 import traceback
 from server_pool import ServerPool
-from db_transfer import DbTransfer
+from server_control import ServerControl
 
 if config.LOG_ENABLE:
     datefmt = '%Y, %b %d %a %H:%M:%S'
@@ -29,15 +43,15 @@ class ServerPoolThread(threading.Thread):
     def stop(self):
         ServerPool.get_instance().stop()
 
-class DbTransferThread(threading.Thread):
+class ServerControlThread(threading.Thread):
     def __init__(self):
-        super(DbTransferThread, self).__init__()
+        super(ServerControlThread, self).__init__()
 
     def run(self):
-        DbTransfer.get_instance().run()
+        ServerControl.get_instance().run()
 
     def stop(self):
-        DbTransfer.get_instance().stop()
+        ServerControl.get_instance().stop()
 
 def main():
     ss_config = {
@@ -52,8 +66,8 @@ def main():
     }
     server_pool_thread = ServerPoolThread(ss_config)
     server_pool_thread.start()
-    db_transfer_thread = DbTransferThread()
-    db_transfer_thread.start()
+    server_control_thread = ServerControlThread()
+    server_control_thread.start()
 
     try:
         while True:
@@ -61,7 +75,7 @@ def main():
     except KeyboardInterrupt as e:
         traceback.print_exc()
         server_pool_thread.stop()
-        db_transfer_thread.stop()
+        server_control_thread.stop()
 
 if __name__ == '__main__':
     main()
