@@ -89,7 +89,7 @@ class ServerControl(object):
         elif is_run and old_password != password:
             logging.info('stop server at port [%s] reason: password changed' % (port))
             ServerPool.get_instance().del_server(port)
-        elif not is_run:
+        elif not is_run and not user['isLocked']:
             logging.info('start server at port [%s] pass [%s]' % (port, password))
             ServerPool.get_instance().add_server({
                 'server_port': port,
