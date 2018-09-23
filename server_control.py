@@ -68,10 +68,10 @@ class ServerControl(object):
         return requests.post(url, json = data, headers = headers).json()
 
     def fetch_users(self):
-        return self.do_request('/api/nodes/' + str(config.NODE_ID) + '/users')
+        return self.do_request('/api/nodes/' + config.NODE_ID + '/users')
 
     def upload_traffic(self, data):
-        return self.do_request('/api/nodes/' + str(config.NODE_ID) + '/traffic', data)
+        return self.do_request('/api/nodes/' + config.NODE_ID + '/traffic', data)
 
     def stop_or_start_server(self, user):
         port = int(user['port'])

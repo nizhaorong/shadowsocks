@@ -27,9 +27,8 @@ from server_pool import ServerPool
 from server_control import ServerControl
 
 if config.LOG_ENABLE:
-    datefmt = '%Y, %b %d %a %H:%M:%S'
     logformat = '%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s'
-    logging.basicConfig(format=logformat, datefmt=datefmt, filename=config.LOG_FILE, level=config.LOG_LEVEL)
+    logging.basicConfig(format=logformat, level=config.LOG_LEVEL)
 
 class ServerPoolThread(threading.Thread):
     def __init__(self, ss_config):
