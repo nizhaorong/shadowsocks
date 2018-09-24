@@ -1,3 +1,55 @@
+shadowsocks for ss-panel
+===========
+
+## 部署
+
+### 使用 Docker + Docker Compose 部署
+
+- 配置 docker-compose.yml
+
+```bash
+cat > ./docker-compose.yml << \EOF
+version: '3'
+services:
+  python:
+    image: qious/shadowsocks:python
+    restart: always
+    network_mode: host
+    environment:
+      APP_SREVER: '::'
+      APP_METHOD: aes-256-cfb
+      APP_TIMEOUT: 60
+      APP_FAST_OPEN: 'false'
+      APP_LOG_ENABLE: 'true'
+      APP_LOG_LEVEL: info
+      APP_API_URL: https://example.com/
+      APP_NODE_ID: 1
+      APP_NODE_TOKEN: token
+      APP_UPDATE_TIME: 30
+EOF
+```
+
+- 运行
+
+```bash
+docker-compose up -d
+```
+
+### 环境变量说明
+
+| 字段   | 描述   |
+|:----|:----|
+| APP_SREVER   | shadowsocks 的 server 字段，docker 请使用 '::' 或者 '0.0.0.0'   |
+| APP_METHOD   | shadowsocks 的加密方式   |
+| APP_TIMEOUT   | shadowsocks 的超时时间   |
+| APP_FAST_OPEN   | shadowsocks 的 TCP Fast Open   |
+| APP_LOG_ENABLE   | 是否打印日志，建议设置为 true   |
+| APP_LOG_LEVEL   | 日志打印等级   |
+| APP_API_URL   | ss-panel 对应的地址   |
+| APP_NODE_ID   | ss-panel 对应的节点编号   |
+| APP_NODE_TOKEN   | ss-panel 对应的节点Token   |
+| APP_UPDATE_TIME   | shadowsocks 与 ss-panel 的交互时间间隔   |
+
 shadowsocks
 ===========
 
