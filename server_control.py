@@ -60,12 +60,13 @@ class ServerControl(object):
 
     def do_request(self, endpoint, data = None):
         url = config.API_URL.rstrip('/') + endpoint
+        timeout = 30
         headers = {
             'node-token': config.NODE_TOKEN
         }
         if data is None:
-            return requests.get(url, headers = headers).json()
-        return requests.post(url, json = data, headers = headers).json()
+            return requests.get(url, headers = headers, timeout = timeout).json()
+        return requests.post(url, json = data, headers = headers, timeout = timeout).json()
 
     def fetch_users(self):
         return self.do_request('/api/nodes/' + config.NODE_ID + '/users')
