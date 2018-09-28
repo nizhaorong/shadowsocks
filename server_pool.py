@@ -85,7 +85,8 @@ class ServerPool(object):
         t.close(next_tick=False)
         u.close(next_tick=False)
         del self._relays[port]
-        del self._statistics[port]
+        if port in self._statistics:
+            del self._statistics[port]
 
     def stat_callback(self, port, data_len):
         self._statistics[port] += data_len

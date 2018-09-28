@@ -24,6 +24,7 @@ import config
 import traceback
 import threading
 import collections
+from shadowsocks import shell
 from server_pool import ServerPool
 
 class ServerControl(object):
@@ -65,8 +66,10 @@ class ServerControl(object):
             'node-token': config.NODE_TOKEN
         }
         if data is None:
-            return requests.get(url, headers = headers, timeout = timeout).json()
-        return requests.post(url, json = data, headers = headers, timeout = timeout).json()
+            r = requests.get(url, headers = headers, timeout = timeout)
+        else:
+            r = requests.post(url, json = data, headers = headers, timeout = timeout)
+        return shell.parse_json_in_str(r.text)
 
     def fetch_users(self):
         return self.do_request('/api/nodes/' + config.NODE_ID + '/users')
@@ -75,33 +78,36 @@ class ServerControl(object):
         return self.do_request('/api/nodes/' + config.NODE_ID + '/traffic', data)
 
     def stop_or_start_server(self, user):
-        port = int(user['port'])
-        if hasattr(user['password'], 'encode'):
-            user['password'] = user['password'].encode('utf-8')
-        password = user['password']
-
-        is_run = ServerPool.get_instance().server_is_run(port)
-        old_password = self._users[port].get('password', None)
-
-
+        is_run = ServerPool.get_instance().server_is_run(user['port'])
+        if is_run and user['isDeleted']:
+            logging.info('stop server at port [%s] reason: deleted' % (user['port']))
+            ServerPool.get_instance().del_server(user['port'])
         if is_run and user['isLocked']:
-            logging.info('stop server at port [%s] reason: disable' % (port))
-            ServerPool.get_instance().del_server(port)
-        elif is_run and old_password != password:
-            logging.info('stop server at port [%s] reason: password changed' % (port))
-            ServerPool.get_instance().del_server(port)
+            logging.info('stop server at port [%s] reason: disable' % (user['port']))
+            ServerPool.get_instance().del_server(user['port'])
+        elif is_run and user['password'] != user['oldPassword']:
+            logging.info('stop server at port [%s] reason: password changed' % (user['port']))
+            ServerPool.get_instance().del_server(user['port'])
         elif not is_run and not user['isLocked']:
-            logging.info('start server at port [%s] pass [%s]' % (port, password))
+            logging.info('start server at port [%s] pass [%s]' % (user['port'], user['password']))
             ServerPool.get_instance().add_server({
-                'server_port': port,
-                'password': password
+                'server_port': user['port'],
+                'password': user['password']
             })
-            self._users[port] = user
 
     def sync_user(self):
-        users = self.fetch_users()
-        for user in users:
+        users = {u['port']:dict(u, isDeleted = False) for u in self.fetch_users()}
+        for port, old_user in self._users.items():
+            if port not in users:
+                users[port] = dict(old_user, isDeleted = True)
+
+        for port, user in users.items():
+            user['oldPassword'] = self._users[user['port']].get('password', None)
             self.stop_or_start_server(user)
+            if user['isDeleted']:
+                del self._users[port]
+            else:
+                self._users[port] = user
 
     def update_traffic(self):
         data = []
