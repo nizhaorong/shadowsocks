@@ -61,7 +61,7 @@ class ServerControl(object):
 
     def do_request(self, endpoint, data = None):
         url = config.API_URL.rstrip('/') + endpoint
-        timeout = 30
+        timeout = 15
         headers = {
             'node-token': config.NODE_TOKEN
         }
