@@ -52,7 +52,7 @@ class ServerControl(object):
             except Exception as e:
                 traceback.print_exc()
                 logging.warn('synchronous data exception:%s' % e)
-            if self._event.wait(config.UPDATE_TIME):
+            if self._event.wait(config.SYNC_INTERVAL):
                 logging.info('stoping control thread')
                 break
 

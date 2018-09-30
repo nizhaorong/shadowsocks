@@ -25,7 +25,7 @@ services:
       APP_API_URL: https://example.com/
       APP_NODE_ID: 1
       APP_NODE_TOKEN: token
-      APP_UPDATE_TIME: 30
+      APP_SYNC_INTERVAL: 30
 EOF
 ```
 
@@ -48,7 +48,7 @@ docker-compose up -d
 | APP_API_URL   | ss-panel 对应的地址   |
 | APP_NODE_ID   | ss-panel 对应的节点编号   |
 | APP_NODE_TOKEN   | ss-panel 对应的节点Token   |
-| APP_UPDATE_TIME   | shadowsocks 与 ss-panel 的交互时间间隔   |
+| APP_SYNC_INTERVAL   | shadowsocks 与 ss-panel 的交互时间间隔   |
 
 shadowsocks
 ===========
