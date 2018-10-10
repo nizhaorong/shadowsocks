@@ -82,13 +82,13 @@ class ServerControl(object):
         if is_run and user['isDeleted']:
             logging.info('stop server at port [%s] reason: deleted' % (user['port']))
             ServerPool.get_instance().del_server(user['port'])
-        if is_run and user['isLocked']:
+        elif is_run and user['isLocked']:
             logging.info('stop server at port [%s] reason: disable' % (user['port']))
             ServerPool.get_instance().del_server(user['port'])
         elif is_run and user['password'] != user['oldPassword']:
             logging.info('stop server at port [%s] reason: password changed' % (user['port']))
             ServerPool.get_instance().del_server(user['port'])
-        elif not is_run and not user['isLocked']:
+        elif not is_run and not user['isDeleted'] and not user['isLocked']:
             logging.info('start server at port [%s] pass [%s]' % (user['port'], user['password']))
             ServerPool.get_instance().add_server({
                 'server_port': user['port'],
