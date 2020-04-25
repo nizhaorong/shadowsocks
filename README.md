@@ -12,7 +12,7 @@ cat > ./docker-compose.yml << \EOF
 version: '3'
 services:
   python:
-    image: qious/shadowsocks:python
+    image: qiujun8023/shadowsocks:python
     restart: always
     network_mode: host
     environment:
